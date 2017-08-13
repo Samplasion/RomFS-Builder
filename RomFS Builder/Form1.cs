@@ -35,7 +35,7 @@ namespace RomFS_Builder
         {
             if (this.isWorkerThreadAlive)
             {
-                MessageBox.Show("There are files currently being processed.");
+                MessageBox.Show("Ci sono file attualmente in processo.");
             }
             else
             {
@@ -62,7 +62,7 @@ namespace RomFS_Builder
             FileNameTable FNT = new FileNameTable(ROOT_DIR);
             RomfsFile[] RomFiles = new RomfsFile[FNT.NumFiles];
             LayoutManager.Input[] In = new LayoutManager.Input[FNT.NumFiles];
-            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Creating Layout...")));
+            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Creando Layout...")));
             for (int i = 0; i < FNT.NumFiles; i++)
             {
                 In[i] = new LayoutManager.Input();
@@ -80,7 +80,7 @@ namespace RomFS_Builder
             }
             using (MemoryStream memoryStream = new MemoryStream())
             {
-                TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Creating RomFS MetaData...")));
+                TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Creando Metadata RomFS...")));
                 MetaDataBuilder mdb = new MetaDataBuilder();
                 mdb.BuildRomFSHeader(memoryStream, RomFiles, ROOT_DIR);
                 MakeRomFSData(RomFiles, memoryStream);
@@ -107,7 +107,7 @@ namespace RomFS_Builder
         private void MakeRomFSData(RomfsFile[] RomFiles, MemoryStream metadata)
         {
             TempFile = Path.GetRandomFileName();
-            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Computing IVFC Header Data...")));
+            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Computando IVFC Header Data...")));
             IVFCInfo ivfc = new IVFCInfo();
             ivfc.Levels = new IVFCLevel[3];
             for (int i = 0; i < ivfc.Levels.Length; i++)
@@ -150,7 +150,7 @@ namespace RomFS_Builder
                 byte[] metadataArray = metadata.ToArray();
                 OutFileStream.Write(metadataArray, 0, metadataArray.Length);
                 long baseOfs = OutFileStream.Position;
-                TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Writing Level 2 Data...")));
+                TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Scrivendo Dati Livello 2...")));
                 PB_Show.Invoke((Action)(() =>
                 {
                     PB_Show.Minimum = 0;
@@ -178,7 +178,7 @@ namespace RomFS_Builder
                 SHA256Managed sha = new SHA256Managed();
                 for (int i = ivfc.Levels.Length - 1; i >= 0; i--)
                 {
-                    TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Computing Level " + i + " Hashes...")));
+                    TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Computando Hash di livello " + i)));
                     byte[] buffer = new byte[(int)ivfc.Levels[i].BlockSize];
                     PB_Show.Invoke((Action)(() =>
                     {
@@ -233,14 +233,14 @@ namespace RomFS_Builder
                     OutFileStream.Dispose();
             }
             TB_Progress.Invoke((Action)(() => UpdateTB_Progress("RomFS Super Block Hash: " + ByteArrayToString(SuperBlockHash))));
-            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Prompting to Save...")));
+            TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Salvando...")));
             SaveFileDialog sfd = new SaveFileDialog();
             Invoke((Action)(() =>
             {
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
 
-                    TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Writing Binary to " + sfd.FileName + "...")));
+                    TB_Progress.Invoke((Action)(() => UpdateTB_Progress("Scrivendo Binaria a " + sfd.FileName + "...")));
                     Thread thread = new Thread(() => WriteBinary(TempFile, sfd.FileName));
                     thread.IsBackground = true;
                     thread.Start();
@@ -284,7 +284,7 @@ namespace RomFS_Builder
             File.Delete(TempFile);
             Invoke((Action)(() =>
             {
-                MessageBox.Show("Wrote RomFS to " + outFile + ".");
+                MessageBox.Show("RomFS scritto a " + outFile + ".");
             }));
         }
 
